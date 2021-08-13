@@ -1,0 +1,45 @@
+SINTAXIS
+
+Señales
+
+1_ Bibliotecas útiles
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <signal.h>
+
+2_Señales útiles
+
+2)SIGINT:(Control+C). Por defecto termina el proceso
+9)SIGKILL: termina el proceso. No se puede ignorar.
+10)SIGUSR1: para usuario	
+12)SIGUSR2: para usuario
+19)SIGSTOP:(Control+z). Detiene el proceso. No se puede ignorar.
+13)SIGPIPE: se manda cuando intento escribir en un pipe que tiene descriptores cerrados
+
+3_Signal: especifica qué hacer con una señal
+
+void ( *signal(int sig, void (*handler)(int))) (int);
+
+Ejemplo: signal(SIGINT, manejador);
+
+En lugar de (*handler) se puede especificar:
+- SIG_DFL: fijar la acción por defecto asociada la señal.
+- SIG_IGN: ignorar la señal.
+
+4_Manejador: funcion que se ejecuta cuando llega la señal
+
+void manejador (int a) {}
+
+(recibe un entero)
+
+5_Kill: envía una señal a otro proceso
+
+int kill(pid_t pid, int sig);
+
+pid: pid del proceso que quiero enviar la señal
+sig: señal que quiero mandar
+

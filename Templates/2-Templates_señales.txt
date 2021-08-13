@@ -1,0 +1,79 @@
+/*
+El siguiente es un template para el uso de las llamadas al sistema relacionadas con el uso de señales.
+*/
+
+Bibliotecas:
+
+#include <signal.h>
+
+			//ENVIO DE SEÑALES
+/*
+	Para ver mas detalles de señales se puede conlocar en una terminal:
+	kill -l
+	man 7 signal (Indica cuando se activa cada señal)
+		
+		Las tipicas son:
+		2  - SIGINT:(Control+C). Por defecto termina el proceso
+		9  - SIGKILL: termina el proceso. No se puede ignorar. (Control+c)
+		10 - SIGUSR1: para usuario	
+		12 - SIGUSR2: para usuario
+		19 - SIGSTOP:(Control+z). Detiene el proceso. No se puede ignorar.
+		13 - SIGPIPE: se manda cuando intento escribir en un pipe que tiene descriptores cerrados
+
+*/
+int main ()
+{
+	pid_t pid1;		//Este tipo de variables son las utilizadas para los PID
+	kill(pid1, SIGKILL);	//Se envia la señal SIGKILL al proceso con PID=pid1
+
+}
+//---------------------------------------------------------------------//		
+			//USO DE MANEJADORES: el manejador es declarado como una llamada a subrutina que luego se relaciona a una señal.
+void manejador()
+{
+
+	/*
+		-
+		-	AQUI VA EL CODIGO DEL HANDLER
+		-
+	*/
+}
+int main ()
+{
+  
+//DECLARACION DE MANEJADOR para la señal SIGUSR1
+
+signal(SIGUSR1, manejador);	//Cada vez que se reciba la señal SIGUSR1 se invocara al manejador
+signal(SIGUSR2, SIG_IGN);	//Cada vez que se reciba la señal SIGUSR2 se ignora
+
+
+}
+//---------------------------------------------------------------------//
+		//EJEMPLO DE MANEJADOR PARA SIGCHLD - ver procesos
+
+
+void manejador(int a){
+	int status;
+	int w;
+	write(0,"\nTerminó hijo\n",sizeof("\n Terminó hijo\n"));
+	w=wait(&status);
+	
+	sprintf(aux,"\nWait arrojo: %d\n", w);
+	write(0,aux,sizeof(aux));
+	
+	sprintf(aux,"\nStatus arrojo: %d\n", status);
+	write(0,aux,sizeof(aux));
+	/*
+		-
+		-	AQUI VA MAS CODIGO DEL HANDLER
+		-
+	*/
+}
+
+int main ()
+{
+  
+//DECLARACION DE MANEJADOR
+signal(SIGCHLD, manejador);
+->ACA se debe crear un HIJO: ver procesos.
+}
