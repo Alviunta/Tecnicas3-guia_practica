@@ -1,0 +1,72 @@
+/*
+El siguiente es un template para el uso de las llamadas al sistema relacionadas con el uso de multiprocesos.
+*/
+
+Bibliotecas:
+
+#include <sys/types.h>    // Define pid_t
+#include <unistd.h>       // Define fork, getpid y getppid
+#include <sys/wait.h>	// Define wait
+
+int main ()
+{
+	pid_t pid;		//Este tipo de variables son las utilizadas para los PID
+	int i;
+
+	pid = fork();		//La funcion devuelve el PID del hijo creado y valdra 0 para el hijo
+	if (pid==-1)		//Validacion de creacion del hijo
+	{
+		printf("ERROR al crear proceso");
+		exit(-1);
+	}
+	
+	else if (pid==0)
+	{
+		/*
+		-
+		-	AQUI VA EL CODIGO DEL HIJO
+		-
+		*/
+		printf ("Mi pid es %d y el pid de papa es %d. fork() devolvio %d\n", getpid(), getppid(), pid);
+		
+		/*
+		Ver arbol de procesos:
+		Para ver el arbol d procesos ejecutamos en una terminal el comando pstree -p o el comando top
+		*/
+	
+		/*
+		Cambio de codigo del proceso hijo:
+		Si deseamos que el proceso hijo realize un cambio de codigo, es decir que el codigo que deba ejecutar se encuentra en otro archivo debemos hacer uso
+		de la llamada a sistema exec
+		Los parametros se pasan en el siguiente orden:
+		"ruta al archivo", "nombre", parametros, , , puntero null
+		Si no se especifica ruta el sistema operativo busca un ejecutable las rutas $PATH
+		*/
+		execlp ("ps", "ps", "-f",(char *)NULL);
+		err = execl	("/bin/ls", "ls", "-l", (char *)NULL);
+	
+		if (err == -1)
+		{
+			printf("Error al llamar al nuevo programa\n");
+			exit (-1);
+		}
+		exit (0);
+	}
+	
+	else if (pid !=0)
+	{
+		/*
+		-
+		-	AQUI VA EL CODIGO DEL PADRE
+		-
+		*/
+		printf ("Mi pid es %d y el pid de papa es %d. fork() devolvio %d\n", getpid(), getppid(), pid);
+	}
+	/*
+	Si deseamos que el padre espere al hijo
+	*/
+	int status
+	pid wait(&status); //En PID se guarda el PID del hijo que termino y en status el valor de exit o return
+	pid wait(NULL); //si no me importa el estado
+	exit(0);
+}

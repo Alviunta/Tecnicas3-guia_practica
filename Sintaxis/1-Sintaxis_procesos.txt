@@ -1,0 +1,41 @@
+SINTAXIS
+
+Procesos
+
+1_ Bibliotecas útiles
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>    // Define pid_t
+#include <unistd.h>       // Define fork, getpid y getppid
+#include <sys/wait.h>	// Define wait
+
+2_Fork: crea hijo
+
+pid_t fork()	
+
+fork devuelve:
+	*Al padre el ID de proceso hijo creado
+	*Al hijo 0
+	*-1 en caso de error
+
+3_Getpid: nos devuelve el pid del proceso actual
+
+pid_t getpid();
+
+4_Getppid: nos devuelve el pid del proceso padre
+
+pid_t getppid();
+
+5_Exit: termina un proceso y guarda en "status" cómo terminó
+
+void exit(int status);
+
+6_Wait: espera la terminación de un hijo, lee el status y guarda el pid del hijo que terminó (o -1 en caso de error)
+
+pid_t wait(int &status);
+pid_t wait(NULL); //si no me importa el estado
+
+
+
+
