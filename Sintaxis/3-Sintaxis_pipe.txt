@@ -1,0 +1,50 @@
+SINTAXIS
+
+Pipe (Tubería sin nombre)
+
+1_ Bibliotecas útiles
+
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
+#include<sys/wait.h> 
+
+2_Descriptores
+
+fd[0]: descriptor de lectura
+fd[1]: descriptor de escritura
+fd[2]: descriptor de error
+
+3_Pipe: crea una tubería
+
+int fd[2]
+
+int pipe(fd);
+
+Devuelve 0 si está bien o -1 si hubo error.
+
+4_Write: escribe en la tubería
+
+char buffer[N];
+
+int write(fd[1], buffer, sizeof(buffer));
+
+Devuelve nro de bytes escritos o -1 (error)
+
+5_Read: lee en la tubería
+
+char buffer[N];
+
+int read(fd[0], buffer, sizeof(buffer));
+
+Devuelve nro de bytes leidos, 0 si EOF o -1 (error)
+
+6_Close: cierra un descriptor
+
+int close(fd[x]);
+
+Devuelve 0 si está bien o -1 si hubo error.
+
+
