@@ -4,6 +4,7 @@ El siguiente es un template para el uso de las llamadas al sistema relacionadas 
 
 Declaracion:
 //Se debe recordar que este es un IPC para procesos relacionados, ver templates de procesos. (Los fd se deben heredar)
+//PERSISTENCIA DE PROCESO
 	
 	int pipefd[2]			//Creamos un arreglo de file descriptor para poder usar la pipe
 					//[0] -> extremo de lectura (salida) 
@@ -14,9 +15,10 @@ Declaracion:
 
 	printf ("pipefd[0] = %d pipefd[1] =%d \n ", pipefd[0], pipefd[1]);	
 
-	//fork();
+// PARA QUE ESTO FUNCIONE DE FORMA OBLIGATORIA DEBO HACER UN fork();
 //-------------------------------------------------------------------------------------------------------------
 Proceso que va a LEER de la pipe:
+
 	close(pipefd[1]); 				// Se cierra el lado de ESCRITURA [1]
 	leido = read(pipefd[0], buff, sizeof(buff)); 	// Se lee hasta <sizeof(buff)> bytes de <pipefd[0]> y se almacena en buff, leido = cant efectiva leida
 							//Llamada BLOQUEANTE
@@ -37,7 +39,7 @@ Proceso que va a ESCRIBIR en la pipe:
 	}
 
 //-------------------------------------------------------------------------------------------------------------
-Destruccion de tuberia
+Destruccion de pipe
 
 	if (close(pipefd[1])<0) 	// Se destruye al destruir todos los fd del extremo de escritura.
 	{
@@ -45,6 +47,7 @@ Destruccion de tuberia
 	}
 //-------------------------------------------------------------------------------------------------------------
 Manejador de señal sigpipe (se lanza cuando hay un problema con una pipe)
+//Broken pipe: write to pipe with no readers; see pipe(7)
 
 	void pipe_sign_handler(int a)
 	{
