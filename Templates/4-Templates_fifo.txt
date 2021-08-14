@@ -1,0 +1,79 @@
+/*
+El siguiente es un template para el uso de las llamadas al sistema relacionadas con el uso de fifo / tuberias con nombre.
+*/
+Declaracion:
+//Se debe recordar que este es un IPC apto para procesos no relacionados
+//FIFO: PERSISTENCIA DE ARCHIVO , MENSAJES: PERSISTENCIA DE PROCESOS
+#include <fcntl.h>
+#include <errno.h>
+#include <string.h>
+#define FIFO_PATH "/tmp/MI_FIFO"		//Por estar en tmp se borrara al reiniciar la PC
+						//SI SE DESEA CREAR MAS DE UNA FIFO DEBE CAMBIARSE EL NOMBRE!
+
+	int err;
+	int fifofd;
+	
+	unlink(FIFO_PATH);    					//si la FIFO existe la borro                   
+								// Se crea el archivo fifo en la ruta definida en FIFO_PATH ("/tmp/MI_FIFO") con los permisos del segundo parametro
+								// FIFO puede ser leida, escrita y ejecutada por: 
+	err = mkfifo(FIFO_PATH, S_IRUSR|S_IWUSR|S_IXUSR|	// el usuario que la creo.
+	                        S_IRGRP|S_IWGRP|S_IXGRP|  	// el grupo al que pertenece el usuario.
+	                        S_IROTH|S_IWOTH|S_IXOTH); 	// el resto de los usuarios del sistema.
+	err = mkfifo(FIFO_PATH, 0777);				// Esta es una sintaxis equivalente 
+	if(err == -1) {
+		write (0, "\nError al crear FIFO, la FIFO ya existe", sizeof("\nError al crear FIFO, la FIFO ya existe")); 
+	}else {
+		write (0, "\nFIFO creado correctamente\n", sizeof("\nFIFO creado correctamente\n")); 
+	}
+//-------------------------------------------------------------------------------------------------------------
+Proceso que va a LEER de la fifo
+ - - - MODO BLOQUEANTE - - - 
+
+ 	if ((fifofd = open(FIFO_PATH, O_RDONLY,0))<0)		//Abre la fifo en modo lectura bloqueante (podria usarse O_RDWR R/W pero no se recomienda)
+ 	{ printf("Error al abrir la fifo")}
+ 	leido = read(fifofd, buff, sizeof(buff));		//Se lee hasta <sizeof(buff)> bytes de <fifofd> y se almacena en buff, leido = cant efectiva leida
+ 	if(leido < 1)					//Error al leer de la FIFO
+	{ 
+		write (0, "\nError al leer fifo", sizeof("\nError al leer fifo"));} 
+	}
+ - - - MODO NO BLOQUEANTE - - - 
+ 
+ 	if ((fifofd = open(FIFO_PATH, O_RDONLY, O_NONBLOCK))<0)	//Abre la fifo en modo lectura NO bloqueante (podria usarse O_RDWR R/W pero no se recomienda)
+ 	{ printf("Error al abrir la fifo")}
+ 	leido = read(fifofd, buff, sizeof(buff));			//Se lee hasta <sizeof(buff)> bytes de <fifofd> y se almacena en buff, leido = cant efectiva leida
+ 	if(leido < 1)					//Error al leer de la FIFO
+	{ 
+		write (0, "\nError al leer fifo", sizeof("\nError al leer fifo"));} 
+	}
+//-------------------------------------------------------------------------------------------------------------
+Proceso que va a ESCRIBIR en la fifo
+ - - - MODO BLOQUEANTE - - - 
+
+ 	if ((fifofd = open(FIFO_PATH, O_WRONLY,0))<0)		//Abre la fifo en modo escritura bloqueante (podria usarse O_RDWR R/W pero no se recomienda)
+ 	{ printf("Error al abrir la fifo")}
+ 	escrito = write(fifofd, MENSAJE, sizeof(MENSAJE)); 	// Se escribe <sizeof(buff)> bytes en <fifofd> y se almacena en buff. escrito = cant efectiva escrita
+ 	if(escrito < 0)					//Error al escribir de la FIFO
+	{ 
+		write (0, "\nError al escibir fifo", sizeof("\nError al escribir fifo"));} 
+	}
+ - - - MODO NO BLOQUEANTE - - - 
+ 
+ 	if ((fifofd = open(FIFO_PATH, O_WRONLY, O_NONBLOCK))<0)	//Abre la fifo en modo escritura NO bloqueante (podria usarse O_RDWR R/W pero no se recomienda)
+ 	{ printf("Error al abrir la fifo")}
+ 	escrito = write(fifofd, MENSAJE, sizeof(MENSAJE)); 	// Se escribe <sizeof(buff)> bytes en <fifofd> y se almacena en buff. escrito = cant efectiva escrita
+ 	if(escrito < 0)					//Error al escribir de la FIFO
+	{ 
+		write (0, "\nError al escibir fifo", sizeof("\nError al escribir fifo"));} 
+	}
+//-------------------------------------------------------------------------------------------------------------
+Cerrado de fifo
+	if (close(fifo_d)<0)				//Se cierra el FD 
+	{printf("Error al cerrar fifo");}
+	if (unlink(FIFO_PATH) < 0) {			//Solo es posible si no hay otros procesos usando la fifo
+ 	printf("\nNo se puede borrar FIFO.\n");}
+//-------------------------------------------------------------------------------------------------------------
+
+
+
+
+

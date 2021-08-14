@@ -1,0 +1,74 @@
+SINTAXIS
+
+FIFO (Tubería con nombre)
+
+1_ Bibliotecas útiles
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <string.h>
+#include<sys/wait.h> 
+
+2_Mkfifo: crea la fifo 
+
+int mkfifo(nombre, mode_t mode);
+
+Ejemplo: 
+#define FIFO_PATH "/tmp/MI_FIFO"
+
+mkfifo(FIFO_PATH, 0777);
+
+Devuelve 0 si tuvo éxito o -1 en caso de error.
+
+3_Open: abre la fifo
+
+int open(nombre, int flags, ... /* mode_t mode */);
+
+El campo mode indica los permisos al crear un archivo, en este caso este campo
+ser coloca en cero. El campo flag indica el modo de apertura:
+O_RDONLY: Abre el archivo sólo para lectura
+O_WRONLY: Abre el archivo para sólo escritura
+O_RDWR: Abre el archivo para lectura y escritura
+O_NONBLOCK Abre en modo sin bloqueo
+
+Ejemplos: 
+
+fifo = open(FIFO_PATH, O_WRONLY, 0);
+fifo = open(FIFO_PATH, O_RDONLY, 0);
+
+4_Write: escribe en la fifo
+
+char buffer[N];
+
+int write(fifo, buffer, sizeof(buffer));
+
+Devuelve nro de bytes escritos o -1 (error)
+
+5_Read: lee en la fifo
+
+char buffer[N];
+
+int read(fifo, buffer, sizeof(buffer));
+
+Devuelve nro de bytes leidos, 0 si EOF o -1 (error)
+
+6_Close: cierra la fifo
+
+int close(fifo);
+
+Devuelve 0 si está bien o -1 si hubo error.
+
+7_Unlink: borra la fifo
+
+int unlink( const char *pathname);
+
+unlink(FIFO_PATH);
+
+Devuelve 0 si tuvo éxito, o –1 en caso de error.
+
+
+
