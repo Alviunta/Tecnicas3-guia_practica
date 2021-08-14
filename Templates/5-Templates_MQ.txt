@@ -1,0 +1,89 @@
+/*
+El siguiente es un template para el uso de las llamadas al sistema relacionadas con el uso de colas de mensaje MQ.
+*/
+Declaracion:
+//Se debe recordar que este es un IPC apto para procesos no relacionados
+//PERSISTENCIA DE ARCHIVO
+//Para compilar se debe agregar la libreria real time -> gcc -o prog prog.c -lrt
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <mqueue.h>
+
+#define MQ_PATH "/MQ_TD3"  			// El nombre de la cola de mensajes debe empezar con "/"
+						//SI SE DESEA CREAR MAS DE UNA FIFO DEBE CAMBIARSE EL NOMBRE!
+
+	int err, leido;
+	char buff[1024];   
+	mqd_t mqfd; 
+	struct mq_attr attr;
+						// Se fijan algunos parametros de la cola de mensajes antes de crearla
+	attr.mq_msgsize = sizeof(buff); 	// Tamaño maximo de cada mensaje
+	attr.mq_maxmsg = 5;			// Cantidad maxima de mensajes en la cola
+
+	mqfd = mq_open(MQ_PATH,		//Se abre la cola de mensajes en <MQ_PATH> y se guarda en <mqfd> el descriptor de archivo asociado
+			O_RDWR | O_CREAT | O_NONBLOCK,	//Si la MQ no existe se crea: <O_CREAT> ; <O_NONBLOCK> MQ no bloqueante
+							//Se abre con permiso de R/W <O_RDWR> ; Para R <O_RDONLY> ; Para W <O_WRONLY>
+			S_IRUSR|S_IWUSR|S_IXUSR|	// el usuario que la creo.
+	                S_IRGRP|S_IWGRP|S_IXGRP|  	// el grupo al que pertenece el usuario.	EQUIVALENTE 0777
+	                S_IROTH|S_IWOTH|S_IXOTH,  	// el resto de los usuarios del sistema.
+			&attr); 		//Se pasa la dir de mem de los atributos configurados. Con NULL se usan por defecto del OS
+	if (mqfd < 0) 
+	{
+		printf ("error en mq_open()");
+		//exit(-1); 
+	}
+
+//-------------------------------------------------------------------------------------------------------------
+Proceso que va a LEER de la MQ
+
+//CUANDO SE ABRE LA COLA DE MENSAJES DEBE COLOCARSE O_RDONLY o O_RDWR en su defecto
+//PREVIAMENTE SE DEBE OBTENER LOS ATRIBUTOS DE LA MQ (a menos que se haya creado en cuyo caso se reemplaza attr_rcv por attr)
+	int prioridad;
+	leido = mq_receive(mqfd, buff, attr_rcv.mq_msgsize, &prioridad); //Se lee hasta <attr_rcv.mq_msgsize> bytes de <mqfd> y se almacena en buff
+									 //leido = cant efectiva leida ; prioridad: prioridad del mensaje recibido
+    	if (( leido < 0 ))					//Error al leer de la MQ
+    	{
+	    	printf ("error en mq_receive()");
+	    	//exit(-1); 
+	}
+
+//-------------------------------------------------------------------------------------------------------------
+Proceso que va a ESCRIBIR en la MQ
+
+//CUANDO SE ABRE LA COLA DE MENSAJES DEBE COLOCARSE O_WRONLY o O_RDWR en su defecto
+	int prioridad;
+	err = mq_send(mqfd, MENSAJE, strlen(MENSAJE)+1, prioridad);  // Se escribe <strlen(MENSAJE)+1> (+1 para darle lugar a '\n') bytes en <mqfd> con <prioridad>  
+      	if(err == -1)s
+      	{
+        	printf ("error en mq_send()");			//Error al enviar a MQ
+		//exit(-1);
+	}
+ 
+//-------------------------------------------------------------------------------------------------------------
+Leer atributos de MQ
+//Se usa para leer los atributos de una MQ que creo otro proceso.
+
+	struct mq_attr attr_rcv;
+	if (mq_getattr(mqfd, &attr_rcv) == -1)
+	{		
+		printf ("error en mq_getattr()");
+		exit(-1);
+	}
+	printf("Nro max. de mensajes en cola de mensajes: %ld\n",attr_rcv.mq_maxmsg);
+	printf("Longitud max. de mensaje: %ld\n",attr_rcv.mq_msgsize);
+	printf("Nros de mensajes pendientes en cola de mensajes: %ld\n",attr_rcv.mq_curmsgs);
+//-------------------------------------------------------------------------------------------------------------
+
+Cerrado de MQ
+	if (close(mqfd)<0)				//Se cierra el FD 
+	{printf("Error al cerrar MQ");}
+	if (unlink(MQ_PATH) < 0) {			//Marca a la cola de mensaje para ser destruida cuando todos los procesos dejen de usarla
+	printf("\nNo se puede borrar MQ.\n");}
+//-------------------------------------------------------------------------------------------------------------
+
+

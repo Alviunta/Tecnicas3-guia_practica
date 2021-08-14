@@ -1,0 +1,81 @@
+SINTAXIS
+
+COLA DE MENSAJES 
+
+1_ Bibliotecas útiles
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <mqueue.h>
+
+2_ Compilación necesaria
+
+gcc -o mq01 mq01.c -lrt
+
+3_MQ_Open: Abre la cola (como tu señora) y la crea si no existe
+
+mqd_t mq_open(const char *name, int oflag, ... mode_t mode,
+struct mq_attr *attr );
+
+mq_open(nombre, banderas, permisos, attr );
+
+Devuelve un descriptor de cola de mensajes en caso de éxito, o (mqd_t) -1 en
+caso de error.
+
+*nombre: path
+*banderas:van separadas por |
+	O_CREAT Crea una cola si esta no existe
+	O_RDONLY Abre para lectura solamente
+	O_WRONLY Abre para escritura solamente
+	O_RDWR Abre para lectura y escritura
+	O_NONBLOCK Abrir en modo de no bloqueo
+*permisos: 0777
+*attr: estructura con atributos de la cola
+
+4_MQ_Close: cierra la cola (no la elimina)
+
+int mq_close(mqd_t mqdes);
+
+mq_close(descriptor);
+
+Devuelve 0 si tiene éxito, o –1 en caso de error.
+
+5_MQ_Unlink: marca la cola para destruirla (cuando se termina de usar)
+
+int mq_unlink(const char *name);--> en el argumento va el PATH
+
+Devuelve 0 si tiene éxito, o –1 en caso de error.
+
+6_MQ_Send: manda mensaje
+
+mq_send(descriptor, mensaje, tamaño del mensaje, prioridad);
+
+Devuelve 0 si tiene éxito, o –1 en caso de error
+
+La prioridad es un entero sin signo
+
+7_MQ_Recieve: recibe mensaje
+
+mq_receive(descriptor, mensaje, tamaño máximo,prioridad);
+
+Devuelve el número de bytes recibidos si tuvo éxito, o –1 si hay error.
+
+La prioridad sería un puntero a int y ahí guardas el valor.
+
+8_MQ_Getattr: consulta de atributos
+
+int mq_getattr(mqd_t mqdes, struct mq_attr *attr);
+
+mq_getattr(descriptor,attr)
+
+Devuelve cero si tuvo éxito y -1 en caso de error.
+
+attr.mq_curmsgs : devuelve la cantidad de mensajes que están actualmente.
+attr.mq_maxmsg: número máximo de mensajes.
+attr.mq_msgsize: tamaño máximo de mensaje (en bytes)
+attr.mq_flags: devuelve las banderas para la descripción de la cola de mensajes abierta (0 o O_NONBLOCK), asociada al descriptor mqdes.
+	
