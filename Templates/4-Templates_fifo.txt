@@ -51,7 +51,7 @@ Proceso que va a ESCRIBIR en la fifo
 
  	if ((fifofd = open(FIFO_PATH, O_WRONLY,0))<0)		//Abre la fifo en modo escritura bloqueante (podria usarse O_RDWR R/W pero no se recomienda)
  	{ printf("Error al abrir la fifo")}
- 	escrito = write(fifofd, MENSAJE, sizeof(MENSAJE)); 	// Se escribe <sizeof(buff)> bytes en <fifofd> y se almacena en buff. escrito = cant efectiva escrita
+ 	escrito = write(fifofd, MENSAJE, sizeof(MENSAJE)); 	// Se escribe <sizeof(buff)> bytes en <fifofd> escrito = cant efectiva escrita
  	if(escrito < 0)					//Error al escribir de la FIFO
 	{ 
 		write (0, "\nError al escibir fifo", sizeof("\nError al escribir fifo"));} 
@@ -60,14 +60,14 @@ Proceso que va a ESCRIBIR en la fifo
  
  	if ((fifofd = open(FIFO_PATH, O_WRONLY, O_NONBLOCK))<0)	//Abre la fifo en modo escritura NO bloqueante (podria usarse O_RDWR R/W pero no se recomienda)
  	{ printf("Error al abrir la fifo")}
- 	escrito = write(fifofd, MENSAJE, sizeof(MENSAJE)); 	// Se escribe <sizeof(buff)> bytes en <fifofd> y se almacena en buff. escrito = cant efectiva escrita
+ 	escrito = write(fifofd, MENSAJE, sizeof(MENSAJE)); 	// Se escribe <sizeof(buff)> bytes en <fifofd>. escrito = cant efectiva escrita
  	if(escrito < 0)					//Error al escribir de la FIFO
 	{ 
 		write (0, "\nError al escibir fifo", sizeof("\nError al escribir fifo"));} 
 	}
 //-------------------------------------------------------------------------------------------------------------
 Cerrado de fifo
-	if (close(fifo_d)<0)				//Se cierra el FD 
+	if (close(fifofd)<0)				//Se cierra el FD 
 	{printf("Error al cerrar fifo");}
 	if (unlink(FIFO_PATH) < 0) {			//Solo es posible si no hay otros procesos usando la fifo
  	printf("\nNo se puede borrar FIFO.\n");}
