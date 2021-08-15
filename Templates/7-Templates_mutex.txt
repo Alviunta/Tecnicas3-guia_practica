@@ -2,7 +2,7 @@
 El siguiente es un template para el uso de las llamadas al sistema relacionadas con el uso de mutex Posix.
 */
 Declaracion:
-//Los mutex son un mecanismo de SYNC por lo que se deben utilizar para controlar el acceso a regiones criticas, tipicamente por el huso de multihilado
+//Los mutex son un mecanismo de SYNC por lo que se deben utilizar para controlar el acceso a regiones criticas, tipicamente por el uso de multihilado
 //Los mutex siempre deben ser declarados como variables GLOBALES (sino no tendria sentido)
 #include <pthread.h>
 #include <stdio.h>
@@ -10,12 +10,12 @@ Declaracion:
 #include <stdlib.h>
 
 // INIALIZACION ESTATICA
-pthread_mutex_t mtx=PTHREAD_MUTEX_INITIALIZER; 		// inicializacion estatica del mutex (lo mas comodo)
+pthread_mutex_t mtx=PTHREAD_MUTEX_INITIALIZER; 		// inicializacion estatica del mutex (lo mas comodo) VARIABLE GLOBAL
 								// Se crea un mutex del tipo normal
 
 //INIALIZACION DINAMICA
 
-pthread_mutex_t mtx;
+pthread_mutex_t mtx;						//Variable tipo mutex GLOBAL
 pthread_mutexattr_t mtxattr;
 
 // -- En main
@@ -33,7 +33,7 @@ int main ()
       	exit(-1);  }							//PTHREAD_MUTEX_DEFAULT o PTHREAD_MUTEX_NORMAL
 
    	s=pthread_mutex_init(&mtx,&mtxattr); 				//Inicia el mutex
-  	if (s!=0){							//Los mutex siempre se inicializan con el valor "1" ()
+  	if (s!=0){							//Los mutex siempre se inicializan con el valor "1"
       	printf("ERROR; pthread_mutex() = %d\n", s);
       	exit(-1);  }
 
