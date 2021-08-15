@@ -1,0 +1,47 @@
+SINTAXIS
+
+Hilos
+
+1_ Bibliotecas útiles
+
+#include <pthread.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+
+2_ Compilación
+
+gcc -o hilos01 hilos01.c -lpthread
+
+3_Pthread_create: crea un hilo
+
+int pthread_create(pthread_t *thread, const pthread_attr_t *attr,
+void *(*start)(void *), void *arg);
+
+rc = pthread_create(puntero_hilo, atributo, funcion, argumento);
+
+Devuelve 0 si tuvo éxito o un error positivo en caso de error.
+
+Los atributos casi siempre van en NULL.
+
+4_Pthread_exit: hace que el hilo termine
+
+void pthread_exit(void *retval);
+
+El valor de retorno tiene que ser global. Gralmente va NULL.
+
+5_Pthread_self: nos da el ID del hilo que lo ejecuta
+
+pthread_t pthread_self(void);
+
+6_Pthread_join: espera que termine un hilo determinado
+
+int pthread_join(pthread_t thread, void **retval);
+
+Devuelve 0 si tiene éxito, o un error positivo en caso de error
+
+7_Pthread_detach: hace que el hilo sea no unible. No lo espera nadie.
+
+int pthread_detach(pthread_t thread);
+
+Devuelve 0 si tiene éxito, o un error positivo en caso de error

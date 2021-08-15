@@ -1,0 +1,60 @@
+/*
+El siguiente es un template para el uso de las llamadas al sistema relacionadas con el uso de hilos.
+*/
+
+Declaracion:
+//A diferencia de los procesos, no existe una estructura de jerarquias. Se comparten espacios de memoria por lo que es posible la necesidad de sincronizar
+//Para compilar se debe agregar la libreria de threads posix -> gcc -o hilos01 hilos01.c -lpthread
+
+#include <pthread.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+
+pthread_t hilo[1];		//Variable donde se guarda el identificador de hilos
+int rc,t;
+pthread_attr_t atributos;	//Variable de atributos para el comportamiento de hilos
+
+
+void *funcion(void * nro) {
+   int a= * (int*) nro;				//Se castea la variable al formato original
+/*
+	-
+	- Lo que sea que haga la otra funcion
+	-
+*/
+}
+
+int main() {
+     t=0;
+     pthread_attr_init (&atributos);			//Se inicializan los atributos con los valores por defecto
+     pthread_attr_setdetachstate (&atributos, 		//Los hilos pueden esperarse. Sino cambiar por PTHREAD_CREATE_DETACHED
+     				PTHREAD_CREATE_JOINABLE);
+     
+     rc = pthread_create(&hilo[0],	 		//Se crea el hilo y se guarda su identificador en <&hilo[0]>
+     			&atributos,			//Permite configurar el comportamiento (NULL es por defecto )
+     			funcion,			//Se crea un hilo nuevo que va a ejecutar <funcion>
+     			(void *)(&t)			// se le pasa una variable <(void *)(&t)> Siempre se debe castear a puntero a null y luego castear al usar
+     			);				
+     if (rc != 0){					//Si no es 0 existe un error al crear el hilo
+         printf("ERROR; pthread_create() = %d\n", rc); 
+         exit(-1);
+     }
+     
+/*
+	-
+	- Lo que sea que haga el hilo main
+	-
+*/
+}
+
+//-------------------------------------------------------------------------------------------------------------
+Funciones para hilos
+	
+	pthread_exit((void *) retval);			//Termina el hilo en ejecucion y retorna el valor <retval> (Se debe castear)
+	pthread_join(hilo[i], (void **)&rec_retval)	//Espera que <hilo[i]> termine de ejecutarse y almacena en <rec_retval>. 
+							//printf("Devuelve %d\n",(int)rec_retval); Para usar se debe castear rec_retval dependiendo del dato original
+	hilo = pthread_self()				//Almacena en <hilo> (variable tipo pthread_t) el ID del hilo
+	pthread_detach(pthread_self()); 		//Hace que el hilo <pthread_self()> se haga no unible, por lo que no se lo espera
+	pthread_yield()				//Hace que el hilo ceda el uso del cpu
+
