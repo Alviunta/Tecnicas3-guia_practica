@@ -1,0 +1,128 @@
+/*
+El siguiente es un template para el uso de las llamadas al sistema relacionadas con el uso de mutex Posix.
+*/
+Declaracion:
+//Los mutex son un mecanismo de SYNC por lo que se deben utilizar para controlar el acceso a regiones criticas, tipicamente por el huso de multihilado
+//Los mutex siempre deben ser declarados como variables GLOBALES (sino no tendria sentido)
+#include <pthread.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+
+// INIALIZACION ESTATICA
+pthread_mutex_t mtx=PTHREAD_MUTEX_INITIALIZER; 		// inicializacion estatica del mutex (lo mas comodo)
+								// Se crea un mutex del tipo normal
+
+//INIALIZACION DINAMICA
+
+pthread_mutex_t mtx;
+pthread_mutexattr_t mtxattr;
+
+// -- En main
+
+int main ()
+{
+  	s=pthread_mutexattr_init(&mtxattr); 				//Inicia los atributos mutex
+ 	if (s!=0){
+      	printf("ERROR; pthread_mutex() = %d\n", s);
+      	exit(-1);  }
+
+  	s=pthread_mutexattr_settype(&mtxattr,PTHREAD_MUTEX_NORMAL); 	//Setea el tipo en atributos mutex solo usamos normal
+  	if (s!=0){							//THREAD_MUTEX_ERRORCHECK: Realiza comprobación de errores en todas las operaciones.
+      	printf("ERROR; pthread_mutex() = %d\n", s);			//PTHREAD_MUTEX_RECURSIVE: Establece un contador que disminuye/aumenta con cada un/lock
+      	exit(-1);  }							//PTHREAD_MUTEX_DEFAULT o PTHREAD_MUTEX_NORMAL
+
+   	s=pthread_mutex_init(&mtx,&mtxattr); 				//Inicia el mutex
+  	if (s!=0){							//Los mutex siempre se inicializan con el valor "1" ()
+      	printf("ERROR; pthread_mutex() = %d\n", s);
+      	exit(-1);  }
+
+}
+
+//-------------------------------------------------------------------------------------------------------------
+Uso de mutex para zona critica (Exclusion mutua)
+
+
+	s=pthread_mutex_lock(&mtx);       			// Toma el mutex -> si esta tomado por otro hilo se bloquea hasta que se libere
+	if (s!=0){						// Si otro intenta tomar el mtx no podra y se bloqueara
+      	printf("ERROR; pthread_mutex() = %d\n", s);
+      	exit(-1);  }	
+      	
+      	/*
+      	 -
+      	 - ZONA CRITICA
+      	 -
+      	*/
+      	
+      	s=pthread_mutex_unlock(&mtx);     			//Libera el mutex pasa a valer "1"
+   	if (s!=0){
+      	printf("ERROR; pthread_mutex() = %d\n", s);
+      	exit(-1);   }
+
+//-------------------------------------------------------------------------------------------------------------
+Uso de mutex para serializacion
+ - - serializazion A --> B
+ //El mutex debe inicializarse en 0 por lo que luego de arrancar se debe hacer
+	s=pthread_mutex_lock(&mtx);       			// Toma el mutex -> si esta tomado por otro hilo se bloquea hasta que se libere
+	if (s!=0){
+      	printf("ERROR; pthread_mutex() = %d\n", s);
+      	exit(-1);  }	
+ 
+En el hilo A:
+	s=pthread_mutex_unlock(&mtx);     			//Libera el mutex para permitir al hilo B que continue su ejecucion
+   	if (s!=0){
+      	printf("ERROR; pthread_mutex() = %d\n", s);
+      	exit(-1);   }
+
+En el hilo B:
+	s=pthread_mutex_lock(&mtx);       			// Al llegar a este punto se bloque a menos que el hilo A ya haya liberado el mtx
+	if (s!=0){
+      	printf("ERROR; pthread_mutex() = %d\n", s);
+      	exit(-1);  }	
+
+//-------------------------------------------------------------------------------------------------------------
+Uso de mutex para punto de encuentro de dos hilos
+//Son necesarios dos mutex inicializados en 0 por lo que:
+pthread_mutex_t mtxa=PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mtxb=PTHREAD_MUTEX_INITIALIZER;
+	s=pthread_mutex_lock(&mtxa);       			// Inicializa el mtxa en 0
+	if (s!=0){
+      	printf("ERROR; pthread_mutex() = %d\n", s);
+      	exit(-1);  }	
+      	s=pthread_mutex_lock(&mtxb);       			// Inicializa el mtxa en 0
+	if (s!=0){
+      	printf("ERROR; pthread_mutex() = %d\n", s);
+      	exit(-1);  }	
+
+En el hilo A:
+	s=pthread_mutex_unlock(&mtxb);     			//Libera el mtxb para hacer que el otro hilo se desbloquee
+   	if (s!=0){
+      	printf("ERROR; pthread_mutex() = %d\n", s);
+      	exit(-1);   }
+      	s=pthread_mutex_lock(&mtxa);       			// Se bloquea el mtx a la espera de que el hilo B lo desbloquee
+	if (s!=0){						// Si el hilo B ya lo libero directamente pasara de largo
+      	printf("ERROR; pthread_mutex() = %d\n", s);
+      	exit(-1);  }
+      	
+En el hilo B:
+	s=pthread_mutex_unlock(&mtxa);     			//Libera el mtxa para hacer que el otro hilo se desbloquee
+   	if (s!=0){
+      	printf("ERROR; pthread_mutex() = %d\n", s);
+      	exit(-1);   }
+      	s=pthread_mutex_lock(&mtxb);       			// Se bloquea el mtx a la espera de que el hilo A lo desbloquee
+	if (s!=0){						// Si el hilo A ya lo libero directamente pasara de largo
+      	printf("ERROR; pthread_mutex() = %d\n", s);
+      	exit(-1);  }
+
+
+//-------------------------------------------------------------------------------------------------------------
+Funciones para mutex
+
+	pthread_mutex_trylock(&mtx)				//Esta es una llamada no bloqueante, devuelve 0 si pudo tomar el mutex 
+	s=pthread_mutex_destroy(&mtx);    			//Destruye el mutex, solo creados dinamicamente (devuelve s=0 si todo sale bien)
+	
+	
+
+
+
+

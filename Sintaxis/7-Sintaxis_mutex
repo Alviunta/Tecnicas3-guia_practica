@@ -1,0 +1,71 @@
+SINTAXIS
+
+Mutex POSIX
+
+1_ Bibliotecas útiles
+
+#include <pthread.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+
+2_ Inicialización de mutex estático (lo más cómodo)
+
+pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
+
+3_Pthread_mutex_lock: resta el mutex
+
+int pthread_mutex_lock(pthread_mutex_t *mutex);
+
+Devuelve 0 si tuvieron éxito y un número positivo en caso de error
+
+4_Pthread_mutex_trylock: lo intenta decrementar pero si está en cero no se bloquea (no la vas a usar nunca)
+
+int pthread_mutex_trylock(pthread_mutex_t * mutex);
+
+Devuelve 0 si tiene éxito, o el error EBUSY indicando que otro hilo tiene el mutex.
+
+5_Pthread_mutex_unlock: suma al mutex
+
+int pthread_mutex_unlock(pthread_mutex_t *mutex);
+
+Devuelve 0 si tiene éxito, un número positivo en caso de error.
+
+6_Inicialización mutex dinámico: 
+
+int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutex attr_t *attr);
+
+Devuelve 0 si tiene éxito o un error positivo en caso de error
+
+El argumento de mutex identifica el mutex para ser inicializado.
+
+Si attr es NULL se tomaran los atributos por defecto
+
+7_Atributos del mutex dinámico
+
+pthread_mutexattr_t mtxattr;
+
+Inicialización de atributos de un mutex
+
+int pthread_mutexattr_init(pthread_mutexattr_t *attr);
+
+Devuelve 0 si tiene éxito, un número positivo en caso de error
+
+8_Seteo de tipo en atributos
+
+int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type);
+
+Devuelve 0 si tuvo éxito o un error positivo en caso de error
+
+Type:
+THREAD_MUTEX_ERRORCHECK
+PTHREAD_MUTEX_RECURSIVE
+PTHREAD_MUTEX_DEFAULT
+PTHREAD_MUTEX_NORMAL
+
+9_Destrucción de un mutex dinámico
+
+int pthread_mutex_destroy(pthread_mutex_t *mutex);
+
+Devuelve 0 si tiene éxito, un número positivo en caso de error
+
