@@ -1,0 +1,61 @@
+SINTAXIS
+
+Semáforos sin nombre
+
+1_ Bibliotecas útiles
+
+#include <stdio.h>
+#include <pthread.h>    
+#include <unistd.h>
+#include <stdlib.h>
+#include <semaphore.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+2_Sem_init: inicializa el semaforo
+
+sem_t sem;
+int sem_init(&sem, int pshared, int value);
+
+Devuelve 0 en caso de éxito, o –1 en caso de error.
+
+pshared ponelo en 0 (indica que es compartido entre hilos)
+
+value es el valor con el que arranca
+
+3_Sem_wait: decrementa el semaforo
+
+sem_t sem;
+int sem_wait(&sem);
+
+Devuelve 0 si tiene éxito, o –1 en caso de error
+
+4_Sem_trywait: decrementa sin bloqueo
+
+sem_t sem;
+int sem_trywait(&sem);
+
+Devuelve 0 si tiene éxito, o –1 en caso de error
+Si la operación de decremento no se puede realizar de inmediato, sem_trywait() falla con el error EAGAIN.
+
+5_Sem_post: incrementa el semaforo
+
+sem_t sem;
+int sem_post(&sem);
+
+Devuelve 0 si tiene éxito, o –1 en caso de error
+
+6_Sem_getvalue: permite obtener el valor del semaforo
+
+sem_t sem;
+int sem_getvalue(&sem, int *sval);
+
+Devuelve 0 si tiene éxito, o –1 en caso de error
+
+7_Sem_destroy: destruye el semaforo
+
+sem_t sem;
+int sem_destroy(&sem);
+
+Devuelve 0 en caso de éxito, o –1 en caso de error.
+

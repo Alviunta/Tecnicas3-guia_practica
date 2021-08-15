@@ -1,0 +1,57 @@
+/*
+El siguiente es un template para el uso de las llamadas al sistema relacionadas con el uso de semaforos sin nombre.
+*/
+
+Declaracion:
+//Los semaforos son un mecanismo de SYNC por lo que se deben utilizar para controlar el acceso a regiones criticas, tipicamente por el uso de multihilado
+//Se pueden realizar las mismas operaciones de SYNC que para los mutex, pero es mas facil con mutex asique para que vas a usar esto
+//El caso de uso por exelencia es productor consumidor (Punto4 del practico)
+#include <stdio.h>
+#include <pthread.h>    
+#include <unistd.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <semaphore.h>
+
+sem_t sem;					//Variable tipo semaforo GLOBAL
+
+int main(){
+	s=sem_init(&sem, 0, 10);		//Inicializa el semaforo en el valor <10> , compartido entre hilos (segundo campo en 0)
+	if (s != 0) {
+	printf("ERROR sem_init()\n");
+	exit(-1);     }
+
+}
+
+//-------------------------------------------------------------------------------------------------------------
+Incremento de semaforo
+
+	s=sem_post(&sem);			//Incrementa el semaforo
+	if (s != 0) {
+	printf("ERROR sem_post()\n");
+	exit(-1);     }
+
+//-------------------------------------------------------------------------------------------------------------
+Decremento de semaforo
+
+	s = sem_wait(&sem);			//Decrementa el semaforo, se bloquea si vale 0
+	if (s != 0) {
+	printf("ERROR sem_wait()\n");
+	exit(-1);     }
+
+//-------------------------------------------------------------------------------------------------------------
+Eliminar el semaforo
+
+	s=sem_destroy(&sem);			//Destruye el semaforo
+	if (s != 0) {
+	printf("ERROR sem_unlink()\n");
+	exit(-1);  }
+
+//-------------------------------------------------------------------------------------------------------------
+Leer el valor actual del semaforo
+
+	int sval;
+	sem_getvalue(&sem, &sval);
+	printf("Valor de semaforo: %d\n",sval);
+
