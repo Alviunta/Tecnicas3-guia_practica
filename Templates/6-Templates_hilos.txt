@@ -55,6 +55,6 @@ Funciones para hilos
 	pthread_join(hilo[i], (void **)&rec_retval)	//Espera que <hilo[i]> termine de ejecutarse y almacena en <rec_retval>. 
 							//printf("Devuelve %d\n",(int)rec_retval); Para usar se debe castear rec_retval dependiendo del dato original
 	hilo = pthread_self()				//Almacena en <hilo> (variable tipo pthread_t) el ID del hilo
-	pthread_detach(pthread_self()); 		//Hace que el hilo <pthread_self()> se haga no unible, por lo que no se lo espera
+	pthread_detach(pthread_self()); 		//Hace que el hilo <pthread_self()> se haga no unible, por lo que no se lo puede usar con pthread_join
 	pthread_yield()				//Hace que el hilo ceda el uso del cpu
 
