@@ -1,0 +1,20 @@
+Comandos en linux para redes
+- Mostrar tabla arp
+	sudo arp -n
+- Mostrar tabla de rutas
+	sudo ip ro
+- Mostrar saltos por redes
+	mtr +ip
+- Mostrar datos de ip y mac
+	ip addr sho
+- Consultar dns por ip
+	host -t MX +direccion
+	host -t A +ip
+- Mostrar puertos en uso
+	sudo netstat -tpn
+- Generar servidor en un determinado puerto (l=listen , t=tcp 5000)
+	nc -lt +ip +puerto
+- Conectarse a un servidor como cliente
+	telnet +ip +puerto
+- Ver puertos preasignados
+	less /etc/services

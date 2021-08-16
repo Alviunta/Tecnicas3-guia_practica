@@ -1,0 +1,36 @@
+git init
+	Crea el entorno de desarrollo
+
+git add <archivo>
+	incluye el archivo en el area de pruebas
+
+git reset head <archivo>
+	vuelve atras la modificacion 	
+
+git status
+	muestra el estado de los archivos en el area de prueba
+
+git commit -m <mensaje>
+	Publica los cambios en el repositorio local
+
+git checkout <archivo>
+	vuelve a la version comiteada del archivo
+
+git log
+	muestra los detalles de los commit realizados y versiones
+
+git diff    //  git diff --staged
+	muestra los cambios entre los archivos de area de prueba y repositorio
+
+git remote add origin <link>
+	linkea el repositorio local con uno en internet
+	
+git push -u origin master
+	sube los datos en el repositorio local al repositorio remoto
+
+git checkout <Commit>
+	vuelve a la version comiteada
+
+git clone <link>
+	descarga el repositorio remoto
+
