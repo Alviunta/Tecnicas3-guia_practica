@@ -5,6 +5,7 @@ Declaracion:
 //Se debe recordar que este es un IPC apto para procesos no relacionados
 //PERSISTENCIA DE ARCHIVO
 //Para compilar se debe agregar la libreria real time -> gcc -o prog prog.c -lrt
+//Las MQ se crean en /dev/mqueue
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,7 +27,7 @@ Declaracion:
 	attr.mq_maxmsg = 5;			// Cantidad maxima de mensajes en la cola
 
 	mqfd = mq_open(MQ_PATH,		//Se abre la cola de mensajes en <MQ_PATH> y se guarda en <mqfd> el descriptor de archivo asociado
-			O_RDWR | O_CREAT | O_NONBLOCK,	//Si la MQ no existe se crea: <O_CREAT> ; <O_NONBLOCK> MQ no bloqueante
+			O_RDWR | O_CREAT /*| O_NONBLOCK*/,	//Si la MQ no existe se crea: <O_CREAT> ; <O_NONBLOCK> MQ no bloqueante
 							//Se abre con permiso de R/W <O_RDWR> ; Para R <O_RDONLY> ; Para W <O_WRONLY>
 			S_IRUSR|S_IWUSR|S_IXUSR|	// el usuario que la creo.
 	                S_IRGRP|S_IWGRP|S_IXGRP|  	// el grupo al que pertenece el usuario.	EQUIVALENTE 0777
