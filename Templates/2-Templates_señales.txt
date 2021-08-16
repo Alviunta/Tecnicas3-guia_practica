@@ -29,7 +29,7 @@ int main ()
 }
 //---------------------------------------------------------------------//		
 			//USO DE MANEJADORES: el manejador es declarado como una llamada a subrutina que luego se relaciona a una señal.
-void manejador()
+void manejador(int a)
 {
 
 	/*
