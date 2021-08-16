@@ -1,0 +1,55 @@
+SINTAXIS
+
+Socket Datagram (UDP)
+
+1_ Bibliotecas útiles
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h> 
+
+2_Socket: crea el socket
+
+int sockfd = socket(int domain, int type, int protocol);
+
+Devuelve un descriptor de fichero en caso de éxito, ó -1 en caso de error.
+
+Asi: SockEscucha=socket(AF_INET, SOCK_STREAM, 0);
+
+3_Bind: asocia el socket a una direccion
+
+int bind(int sockfd,const struct sockaddr *addr, socklen_t addrlen);
+
+Devuelve 0 si tuvo éxito, o –1 en caso de error.
+
+Estructura:
+
+struct_sockaddr_in {
+char sin_len     //longitud total de la dirección
+char sin_family  //Familia de la dirección (AF_INET)
+short sin_port   //número de puerto de protocolo
+struct in_addr sin_addr //dirección IP del host
+}
+
+4_Recvfrom: recibe un datagrama y guarda endpoint remoto en estructura
+
+ssize_t recvfrom(int sockfd, void *buffer, size_t length, int flags,struct sockaddr *src_addr, socklen_t *addrlen);
+
+Devuelve el númerode bytes recibidos, 0 en EOF, o -1 en caso de error.
+
+5_Sendto: Envia un datagrama al endpoint que indica la estructura
+
+ssize_t sendto(int sockfd, const void *buffer, size_t length,int flags,const struct sockaddr *dest_addr, socklen_t addrlen)
+
+Devuelve el número de bytes enviados, o -1 en caso de error.
+
+6_Close: cerrar conexion
+
+close(int sockfd);
+
+Devuelve -1 en caso de error.
+
