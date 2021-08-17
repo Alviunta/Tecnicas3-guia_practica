@@ -59,7 +59,7 @@ Proceso que va a ESCRIBIR en la MQ
 //CUANDO SE ABRE LA COLA DE MENSAJES DEBE COLOCARSE O_WRONLY o O_RDWR en su defecto
 	int prioridad;
 	err = mq_send(mqfd, MENSAJE, strlen(MENSAJE)+1, prioridad);  // Se escribe <strlen(MENSAJE)+1> (+1 para darle lugar a '\n') bytes en <mqfd> con <prioridad>  
-      	if(err == -1)s
+      	if(err == -1)
       	{
         	printf ("error en mq_send()");			//Error al enviar a MQ
 		//exit(-1);
