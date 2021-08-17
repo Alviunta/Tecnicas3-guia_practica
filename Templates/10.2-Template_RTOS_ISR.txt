@@ -1,0 +1,105 @@
+//TEMPLATE RTOS CON ISR
+//Usa un semaforo (sem) para sincronizar entre tareas y ISR
+
+#include "board.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "FreeRTOSConfig.h"
+#include "queue.h"
+#include "string.h"
+#include "stdlib.h"
+#include "semphr.h"
+
+
+#define PRIO_TAREA1 1
+#define PRIO_TAREA2 2
+#define TAM_PILA 150
+#define mainDELAY_LOOP_COUNT        ( 0xffffff )
+
+SemaphoreHandle_t sem; //Recurso compartido con la ISR
+
+static void initHardware(void) //Inicializa el HW del microcontrolador
+{
+	SystemCoreClockUpdate();
+	Board_Init();
+}
+
+
+static void InitTimer(void) //Seteamos cada cuantos microsegundos queremos una interrupcion
+{
+	Chip_RIT_Init(LPC_RITIMER);
+	Chip_RIT_SetTimerInterval(LPC_RITIMER,3000); //Tiempo en ms del timer
+}
+
+void RIT_IRQHandler(void) //Cada vez que entra una interrupciÛn ejecuta este cÛdigo
+{
+	
+	
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;	
+	
+	///* Despierta las tareas */
+	xSemaphoreGiveFromISR( sem, &xHigherPriorityTaskWoken ); //Ac· iria lo que deberias liberar con la ISR (en este caso sem)
+	
+	if( xHigherPriorityTaskWoken == pdTRUE ){
+		portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+		/* Si el sem√°foro ha despertado
+		una tarea , se fuerza un cambio
+		de contexto */
+	}
+	/* Borra el flag de interrupci√≥n */
+	Chip_RIT_ClearInt(LPC_RITIMER);
+}
+
+void vApplicationIdleHook( void )
+{
+	//Se va a ejecutar cuando ninguna tarea este lista. No hay que hacerla con loop. No se puede bloquear (usar esperas activas si fuese necesario)
+}
+
+static void vTarea1(void *pvParameters)
+{
+	
+	/* As per most tasks, this task is implemented in an infinite loop. */
+	for( ;; ) {
+		
+		
+	}
+}
+
+static void vTarea2(void *pvParameters)
+{
+		
+	while(1)
+	{
+		//Esta tarea se bloquear· hasta que entre la ISR
+		if (( xSemaphoreTake( sem, (portTickType) 1000 )) == pdTRUE) //Se desperto de la ISR
+		{
+			//Esto pasa cada vez que entra la ISR y se desbloquea el sem·foro
+			
+		}
+	}
+}
+
+
+int main(void)
+{
+	//Se inicializa HW
+	initHardware(); /* Inicializa el Hardware del microcontrolador */
+	InitTimer();
+	
+	/* Se inicializan los sem√°foros */
+	sem = xSemaphoreCreateBinary ();  //se inicializa por defecto en 0
+	
+	/* Se crean las tareas */
+	xTaskCreate(vTarea1, (const char *)"Tarea1", TAM_PILA, NULL, PRIO_TAREA1, NULL );
+	xTaskCreate(vTarea2, (const char *)"Tarea2", TAM_PILA, NULL, PRIO_TAREA2, NULL );
+	
+	NVIC_EnableIRQ(RITIMER_IRQn); //comentar que hace esta linea .....
+	/* Set lowest priority for RIT */
+	NVIC_SetPriority(RITIMER_IRQn, (1<<__NVIC_PRIO_BITS) - 1);
+	
+	vTaskStartScheduler(); /* y por √∫ltimo se arranca el planificador . */
+	//Nunca llegara a ese lazo  .... espero
+	for( ;; );
+	return 0;
+	
+}

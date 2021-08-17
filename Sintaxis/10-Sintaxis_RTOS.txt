@@ -1,0 +1,156 @@
+//SINTAXIS RTOS
+
+//Crear tareas
+
+	//1)
+	xTaskCreate(vTarea1, (const char *)"Tarea1", TAM_PILA, NULL, PRIO_TAREA1, NULL ); //(funcion,nombre,tamañopila,*parametros,prioridad,manejador)
+
+	//2)
+	TaskHandle_t xTaskHandle; //variable global guardara id de tarea
+	xTaskCreate( vTarea2, "Tarea2", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY+1, &xTask2Handle );
+
+	//3)
+	const char *pcTextoTarea1 = "Tarea1 is running\r\n";
+
+	xTaskCreate(vTarea, (const char *)"Tarea1", TAM_PILA, (void*)pcTextoTarea1, tskIDLE_PRIORITY+1, NULL ); //Envia argumentos a la funcion (casteados a void)
+
+		//En la funcion lo recibo de esta manera
+		char *pcTaskName;
+		/* The string to print out is passed in via the parameter.  Cast this to a
+		character pointer. */
+		pcTaskName = ( char * ) pvParameters;
+
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------//
+
+//Borrar tarea
+		
+	vTaskDelete( NULL ); //Se borra a si misma
+		
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------//
+		
+//Manejo de prioridad de tareas
+
+	TaskHandle_t xTask2Handle; //variable de manejador de tarea
+	UBaseType_t uxPriority; //variable de prioridad
+	uxPriority = uxTaskPriorityGet( NULL ); //retorna la propia prioridad
+	vTaskPrioritySet( xTask2Handle, ( uxPriority + 1 ) ); // Cambia la prioridad de la tarea
+	vTaskPrioritySet( NULL, ( uxPriority - 2 ) ); //NULL indica manejador propio
+	
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------//
+
+//Arrancar planificador
+	vTaskStartScheduler(); /* y por ultimo se arranca el planificador . */
+	//Nunca llegara a ese lazo  .... espero
+	for( ;; );
+	return 0;
+	
+//Suspender y renaudar planificador
+	vTaskSuspendAll();
+	xTaskResumeAll();
+	
+	
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------//
+
+//Delays
+	
+	vTaskDelay( xDelay1000ms ); //Suspende la tarea por cierta cantidad de tics
+	
+	TickType_t xLastWakeTime, xDelayms;
+	xLastWakeTime = xTaskGetTickCount(); // se inicializa la variable con la actual cantidad de ticks. Luego es manejada por la API de vTaskDelayUntil()
+	xDelayms= pdMS_TO_TICKS( 500UL ); //macro para convertir ms en ticks;
+	vTaskDelayUntil( &xLastWakeTime, xDelayms ); //Asegura cierta cantidad de tics entre una ejecucion y otra
+	
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------//
+
+//Semáforos
+	
+	SemaphoreHandle_t sem; //Declaración (tiene que ser global para que lo vean todas las tareas que lo usan)
+	
+	sem = xSemaphoreCreateBinary ();  //Inicialización: se inicializa por defecto en 0, se hace antes de crear las tareas
+	xSemaphoreTake (sem , portMAX_DELAY); //Lo toma con un timeout determinado
+	xSemaphoreGive (sem);//Lo suelta
+	
+	mutex = xSemaphoreCreateMutex (); //Inicialización de mutex. Es igual que el otro pero evita inversion de prioridad
+
+	//Si falla o se acaba el timeout retorna pdFAIL
+	
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------//
+	
+//Cola de mensajes
+	# define TAM_COLA 20 /* 20 mensajes */
+	# define TAM_MSG 4 
+	
+	QueueHandle_t cola; // Hay que declararla Global, se usa en distintas tareas
+	
+	cola = xQueueCreate (TAM_COLA, TAM_MSG); //Crea la cola (generalmente en el main)
+	
+	BaseType_t xStatus; //Variable de estado de cola
+	
+	char mensaje[5];
+	strcpy(mensaje,"1000");
+	
+	//Enviar
+	xStatus = xQueueSend (cola, (void *) mensaje, portMAX_DELAY); //Escribe en la cola 
+	if (xStatus==pdFAIL) printf("Error en la escritura (Tarea1)\r\n");
+	
+	//Recibir
+	char cad [5];
+	int a;
+	if (xQueueReceive (cola, (void *) cad,(portTickType) 0xFFFFFFFF )==pdTRUE) //Recibe datos de la cola
+	{
+		a=atoi(cad); //Convierte a int lo recibido
+		printf("%d. \r\n", a);
+	}
+	else printf("Error en la lectura.\r\n");
+	
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------//
+	
+//Espera activa (imprecisa)
+
+	#define mainDELAY_LOOP_COUNT        ( 0xffffff )
+	
+	for( ul = 0; ul < mainDELAY_LOOP_COUNT; ul++ ) {
+	}
+	
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------//
+	
+//Espera activa (precisa)
+	TickType_t xLastWakeTime;
+	const TickType_t xDelay300ms = pdMS_TO_TICKS( 300UL ); //macro para convertir ms en ticks
+	
+	//Esto va en el bucle de la tarea
+	xLastWakeTime=xTaskGetTickCount();
+	while((xTaskGetTickCount()-xLastWakeTime)<xDelay300ms)
+	{
+		//acá no poner nada. Está esperando que se cumpla la condición para salir
+	}
+	//Acá termino la espera
+	
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------//
+	
+//Manejo de tics a ms
+	
+	const TickType_t xDelay1000ms = pdMS_TO_TICKS( 1000UL ); //convierte tics a ms
+	printf ( "cuantos tics por ms: %d\r\n",portTICK_RATE_MS ); //muestra cantidad de tics por ms 
+
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------//
+	
+//Manejo LEDS
+	
+	Board_LED_Set(3, TRUE); //prende "LED 5" ( amarillo )
+	Board_LED_Set(3, FALSE); //apaga "LED 5" ( amarillo )
+	
+	Board_LED_Toggle(2); //Cambia el estado del led 2
+	
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------//
+	
+//Leer entradas
+	
+	Board_GPIO_GetStatus(BOARD_GPIO_0);
+	Board_GPIO_GetStatus(BOARD_GPIO_1);
+	Board_GPIO_GetStatus(BOARD_GPIO_2);
+	Board_GPIO_GetStatus(BOARD_GPIO_3);
+
+
+	
+	
