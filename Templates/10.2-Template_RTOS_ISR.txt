@@ -9,12 +9,18 @@
 #include "string.h"
 #include "stdlib.h"
 #include "semphr.h"
+#include "chip.h"
 
 
 #define PRIO_TAREA1 1
 #define PRIO_TAREA2 2
 #define TAM_PILA 150
 #define mainDELAY_LOOP_COUNT        ( 0xffffff )
+
+const TickType_t xDelay300ms = pdMS_TO_TICKS( 300UL ); 	//macro para convertir ms en ticks
+const TickType_t xDelay500ms = pdMS_TO_TICKS( 500UL ); 	//macro para convertir ms en ticks
+const TickType_t xDelay1000ms = pdMS_TO_TICKS( 1000UL ); 	//macro para convertir ms en ticks
+
 
 SemaphoreHandle_t sem; //Recurso compartido con la ISR
 

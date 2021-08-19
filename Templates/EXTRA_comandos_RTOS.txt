@@ -1,0 +1,30 @@
+Verificación del entorno
+
+	Mediante el comando lsusb se observan las placas EDU-CIAAconectadas:
+		lsusb
+
+	Se listan además los dispositivos seriales del chipFTDI en la EDU-CIAA:
+	El puerto serie es el dispositivo/dev/ttyUSB1
+		ls /dev/ttyU* -la
+		
+		
+	En el archivo program.mk se especifica cual será el programa a compilar y ejecutar
+	Comentar todas las líneas (con #) a excepción de PROGRAM_PATH = examples/c y PROGRAM_NAME =app observar que PROGRAM_PATH+PROGRAM_NAME forman la ruta hasta el
+	directorio del proyecto (relativa a firmware_v3)
+	
+	Para compilar y cargar se ejecuta:
+		make
+		make download //o make write (depende de en que placa estamos)
+	
+	Para ver el puerto serie se ejecuta:
+		picocom /dev/ttyUSB1-b 115200 
+		(para salir se presiona ctrl+a y luego ctrl+x)
+	
+	Para usar el emulador de entradas digitales se hace:
+		En program.mk se descomenta:
+			PROGRAM_PATH = examples/c/lab
+			PROGRAM_NAME = input
+		Se abre:
+			picocom /dev/ttyS0 -b 115200 -t s
+			
+
