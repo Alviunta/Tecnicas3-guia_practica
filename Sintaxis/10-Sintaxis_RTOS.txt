@@ -6,7 +6,7 @@
 	xTaskCreate(vTarea1, (const char *)"Tarea1", TAM_PILA, NULL, PRIO_TAREA1, NULL ); //(funcion,nombre,tamañopila,*parametros,prioridad,manejador)
 
 	//2)
-	TaskHandle_t xTaskHandle; //variable global guardara id de tarea
+	TaskHandle_t xTask2Handle; //variable global guardara id de tarea
 	xTaskCreate( vTarea2, "Tarea2", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY+1, &xTask2Handle );
 
 	//3)
@@ -30,7 +30,7 @@
 		
 //Manejo de prioridad de tareas
 
-	TaskHandle_t xTask2Handle; //variable de manejador de tarea
+	TaskHandle_t xTask2Handle; //variable de manejador de tarea (GLOBAL)
 	UBaseType_t uxPriority; //variable de prioridad
 	uxPriority = uxTaskPriorityGet( NULL ); //retorna la propia prioridad
 	vTaskPrioritySet( xTask2Handle, ( uxPriority + 1 ) ); // Cambia la prioridad de la tarea
@@ -137,10 +137,17 @@
 	
 //Manejo LEDS
 	
-	Board_LED_Set(3, TRUE); //prende "LED 5" ( amarillo )
-	Board_LED_Set(3, FALSE); //apaga "LED 5" ( amarillo )
+	Board_LED_Set(3, TRUE); //prende "LED 5" 
+	Board_LED_Set(3, FALSE); //apaga "LED 5" 
 	
-	Board_LED_Toggle(2); //Cambia el estado del led 2
+	//Cambia el estado del led 
+	Board_LED_Toggle(0); /* Red (RGB) */
+	Board_LED_Toggle(1); /* Green (RGB) */
+	Board_LED_Toggle(2); /* Blue (RGB) */
+	Board_LED_Toggle(3); /* Yellow */
+	Board_LED_Toggle(4); /* Red */
+	Board_LED_Toggle(5); /* Green */
+	
 	
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------//
 	
@@ -150,7 +157,13 @@
 	Board_GPIO_GetStatus(BOARD_GPIO_1);
 	Board_GPIO_GetStatus(BOARD_GPIO_2);
 	Board_GPIO_GetStatus(BOARD_GPIO_3);
-
-
 	
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------//
+//Escribir por puerto serie:
+
+	//Forma no atomica:
+	printf("Cadena");
+	//Forma atomica
+	vPrintString("Cadena");
+	vPrintStringAndNumber( pcTaskName, ulIdleCycleCount );
 	
